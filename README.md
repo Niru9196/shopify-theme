@@ -4,13 +4,6 @@ Pixel-accurate recreation of `purelane-homepage.html` as a merchant-editable Sho
 
 ---
 
-## Notes on the original HTML
-
-- Single monolithic 1,700-line file with inline CSS, JS, and base64 SVG product images. Not deployable to Shopify as-is.
-- Dual colour palette defined (dark then light override) — only light mode is active; dark vars are dead code.
-- Product images are placeholder SVGs baked into CSS custom properties. Real images need to come from Shopify CDN.
-- Fixed-position underwater background means all page content must layer above it (`z-index: 2+`).
-
 ## What I changed and why
 
 - **Split into 16 independent sections** — each has a full schema so merchants can add, remove, reorder, and edit content without touching code.

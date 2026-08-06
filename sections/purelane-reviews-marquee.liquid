@@ -1,0 +1,327 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign rating = section.settings.rating
+  assign review_count = section.settings.review_count
+  assign homes_count = section.settings.homes_count
+  assign speed = section.settings.speed
+  assign reviews = section.blocks
+-%}
+
+{%- if reviews.size > 0 -%}
+<section class="pl-sec pl-revband purelane-section" id="pl-reviews" data-scene="1">
+  <div class="pl-wrap">
+    <div class="pl-revhead pl-rv">
+      {%- if kicker != blank -%}
+        <span class="pl-kicker">{{ kicker }}</span>
+      {%- endif -%}
+      <span class="pl-revhead__agg">
+        <span class="pl-revhead__stars">★★★★★</span>
+        <b>{{ rating }}</b> from {{ review_count }}
+      </span>
+      {%- if homes_count != blank -%}
+        <span class="pl-revhead__agg">Loved by <b>{{ homes_count }}</b> homes</span>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="pl-revrail pl-rv" aria-label="Customer reviews">
+    <div class="pl-revtrack" style="animation-duration: {{ speed }}s;">
+      {%- comment %} First pass {% endcomment -%}
+      {%- for block in reviews -%}
+        <article class="pl-glass-2 pl-rcard" {{ block.shopify_attributes }}>
+          <div class="pl-rcard__stars">★★★★★</div>
+          <h5>{{ block.settings.title }}</h5>
+          <p>{{ block.settings.body }}</p>
+          <div class="pl-rcard__who">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>
+            <b>{{ block.settings.author }}</b>
+            {%- if block.settings.product_name != blank -%}
+              <span>&middot; {{ block.settings.product_name }}</span>
+            {%- endif -%}
+          </div>
+        </article>
+      {%- endfor -%}
+      {%- comment %} Duplicate for seamless loop {% endcomment -%}
+      {%- for block in reviews -%}
+        <article class="pl-glass-2 pl-rcard" aria-hidden="true">
+          <div class="pl-rcard__stars">★★★★★</div>
+          <h5>{{ block.settings.title }}</h5>
+          <p>{{ block.settings.body }}</p>
+          <div class="pl-rcard__who">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>
+            <b>{{ block.settings.author }}</b>
+            {%- if block.settings.product_name != blank -%}
+              <span>&middot; {{ block.settings.product_name }}</span>
+            {%- endif -%}
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+<style>
+  .pl-revband {
+    padding: var(--pl-sec-y) 0;
+  }
+
+  .pl-revhead {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 18px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .pl-revhead__agg {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--pl-paper-2);
+  }
+
+  .pl-revhead__agg b {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    color: var(--pl-accent);
+    letter-spacing: 0;
+  }
+
+  .pl-revhead__stars {
+    color: #7a9c1e;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+  }
+
+  /* ---------- RAIL ---------- */
+  .pl-revrail {
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  .pl-revtrack {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: pl-marq linear infinite;
+  }
+
+  .pl-revrail:hover .pl-revtrack,
+  .pl-revrail:focus-within .pl-revtrack {
+    animation-play-state: paused;
+  }
+
+  @keyframes pl-marq {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* ---------- CARD ---------- */
+  .pl-rcard {
+    flex: 0 0 auto;
+    width: 284px;
+    padding: 15px 17px;
+    border-radius: 18px;
+  }
+
+  .pl-rcard__stars {
+    color: #7a9c1e;
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    margin-bottom: 9px;
+  }
+
+  .pl-rcard h5 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pl-surface);
+    margin-bottom: 7px;
+  }
+
+  .pl-rcard p {
+    font-size: 12.6px;
+    color: var(--pl-paper-2);
+    line-height: 1.52;
+    margin-bottom: 11px;
+  }
+
+  .pl-rcard__who {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pl-paper-3);
+  }
+
+  .pl-rcard__who b {
+    color: #01423b;
+    font-weight: 700;
+  }
+
+  .pl-rcard__who svg {
+    width: 12px;
+    height: 12px;
+    color: var(--pl-green);
+    flex: 0 0 auto;
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width: 760px) {
+    .pl-rcard {
+      width: 250px;
+      padding: 13px 14px;
+    }
+
+    .pl-revtrack {
+      animation-duration: 40s !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pl-revtrack {
+      animation: none;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Reviews Marquee",
+  "tag": "section",
+  "class": "purelane-reviews-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker text",
+      "default": "That's what they said"
+    },
+    {
+      "type": "text",
+      "id": "rating",
+      "label": "Average rating",
+      "default": "4.8"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review count text",
+      "default": "8,000+ reviews"
+    },
+    {
+      "type": "text",
+      "id": "homes_count",
+      "label": "Homes count",
+      "default": "12 lakh+"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed (seconds)",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "default": 52,
+      "info": "Lower = faster."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Works like a charm"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Review body",
+          "default": "Finally an eco option that cleans as well as the chemical detergent I used for years, and it smells better."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author name",
+          "default": "Anita"
+        },
+        {
+          "type": "text",
+          "id": "product_name",
+          "label": "Product name",
+          "default": "Laundry detergent"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Reviews Marquee",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "title": "Works like a charm",
+            "body": "Finally an eco option that cleans as well as the chemical detergent I used for years, and it smells better.",
+            "author": "Anita",
+            "product_name": "Laundry detergent"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Best dishwash ever",
+            "body": "Our old dishwash left my help with dry, cracked skin. That stopped completely after we switched.",
+            "author": "Priya",
+            "product_name": "Dishwash gel"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Great product, great packaging",
+            "body": "Very soft on hands with a lovely fragrance, and it feels good to be using far less plastic.",
+            "author": "Sunita",
+            "product_name": "Liquid handwash"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Dog friendly",
+            "body": "We switched because chemical floor cleaners were setting off my dog's allergies. No reactions since.",
+            "author": "Rohit S.",
+            "product_name": "Floor cleaner"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Sparkling taps again",
+            "body": "Hard water had ruined our bathroom fittings. Two sprays and the scale wipes straight off, no scrubbing.",
+            "author": "Verified buyer",
+            "product_name": "Tap cleaner"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,357 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign heading = section.settings.heading
+  assign body = section.settings.body
+  assign cta_text = section.settings.cta_text
+  assign cta_url = section.settings.cta_url
+  assign products = section.blocks | where: 'type', 'product'
+  assign stats = section.blocks | where: 'type', 'stat'
+-%}
+
+<section class="pl-sec purelane-section" id="pl-proof" data-scene="3">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-sec-pad pl-rv">
+      <div class="pl-proof">
+        {%- comment %} Left: copy {% endcomment -%}
+        <div class="pl-proof__left">
+          {%- if kicker != blank -%}
+            <span class="pl-kicker">{{ kicker }}</span>
+          {%- endif -%}
+          <h2 class="pl-d2" style="margin-top:12px">{{ heading }}</h2>
+          {%- if body != blank -%}
+            <p class="pl-body-s" style="max-width:40ch">{{ body }}</p>
+          {%- endif -%}
+          {%- if cta_text != blank -%}
+            <a class="pl-btn pl-btn-primary" href="{{ cta_url }}" style="margin-top:22px">
+              {{ cta_text }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- comment %} Right: product rotator {% endcomment -%}
+        {%- if products.size > 0 -%}
+          <purelane-rotator class="pl-glass-2 pl-rot" data-interval="{{ section.settings.rotator_speed }}" aria-hidden="true">
+            <div class="pl-rot__frame">
+              {%- for block in products -%}
+                {%- if block.settings.image != blank -%}
+                  <img
+                    class="pl-rot__item{% if forloop.first %} pl-on{% endif %}"
+                    src="{{ block.settings.image | image_url: width: 400 }}"
+                    alt="{{ block.settings.name }}"
+                    data-name="{{ block.settings.name }}"
+                    data-note="{{ block.settings.note }}"
+                    width="200"
+                    height="auto"
+                    loading="lazy"
+                    {{ block.shopify_attributes }}
+                  >
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            <div class="pl-rot__cap">
+              <b class="pl-rot__cap-name">{{ products.first.settings.name }}</b>
+              <span class="pl-rot__cap-note">{{ products.first.settings.note }}</span>
+            </div>
+            <div class="pl-rot__dots">
+              {%- for block in products -%}
+                <i class="pl-rot__dot{% if forloop.first %} pl-on{% endif %}"></i>
+              {%- endfor -%}
+            </div>
+          </purelane-rotator>
+        {%- endif -%}
+      </div>
+
+      {%- comment %} Stats bar {% endcomment -%}
+      {%- if stats.size > 0 -%}
+        <div class="pl-glass-2 pl-stats pl-proof__stats">
+          {%- for block in stats -%}
+            <div class="pl-stat" {{ block.shopify_attributes }}>
+              <div class="pl-stat__ring">{{ block.settings.value }}</div>
+              <h5>{{ block.settings.label }}</h5>
+              <p>{{ block.settings.description }}</p>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'purelane-rotator.js' | asset_url }}" defer="defer"></script>
+
+<style>
+  /* ---------- PROOF GRID ---------- */
+  .pl-proof {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 900px) {
+    .pl-proof {
+      grid-template-columns: 1.05fr 0.62fr;
+      gap: 30px;
+      align-items: center;
+    }
+  }
+
+  .pl-proof__left .pl-d2 {
+    margin-bottom: 14px;
+  }
+
+  .pl-proof__stats {
+    margin-top: 20px;
+    grid-column: 1 / -1;
+  }
+
+  /* ---------- ROTATOR ---------- */
+  .pl-rot {
+    position: relative;
+    padding: 18px 12px 16px;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pl-rot__frame {
+    position: relative;
+    width: 100%;
+    height: 206px;
+  }
+
+  .pl-rot__item {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 196px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.94);
+    transition: opacity 0.75s var(--pl-ease), transform 0.75s var(--pl-ease);
+    filter: drop-shadow(0 11px 17px rgba(0, 74, 66, 0.14));
+  }
+
+  .pl-rot__item.pl-on {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .pl-rot__cap {
+    margin-top: 12px;
+    text-align: center;
+    min-height: 32px;
+  }
+
+  .pl-rot__cap-name {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--pl-surface);
+  }
+
+  .pl-rot__cap-note {
+    display: block;
+    font-size: 11px;
+    color: var(--pl-paper-3);
+    margin-top: 3px;
+  }
+
+  .pl-rot__dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  .pl-rot__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(75, 58, 143, 0.22);
+    transition: 0.4s var(--pl-ease);
+    font-style: normal;
+  }
+
+  .pl-rot__dot.pl-on {
+    background: var(--pl-accent);
+    width: 17px;
+    border-radius: 999px;
+  }
+
+  /* ---------- STATS ---------- */
+  .pl-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 22px 18px;
+  }
+
+  @media (min-width: 640px) {
+    .pl-stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .pl-stat {
+    text-align: center;
+  }
+
+  .pl-stat__ring {
+    width: 74px;
+    height: 74px;
+    margin: 0 auto 11px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid rgba(75, 58, 143, 0.24);
+    background: radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.86), rgba(236, 230, 247, 0.52));
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--pl-surface);
+    letter-spacing: -0.02em;
+  }
+
+  .pl-stat h5 {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--pl-accent);
+    margin-bottom: 5px;
+  }
+
+  .pl-stat p {
+    font-size: 11.4px;
+    color: var(--pl-paper-2);
+    line-height: 1.44;
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width: 760px) {
+    .pl-rot__frame { height: 172px; }
+    .pl-rot__item { height: 164px; }
+    .pl-stat__ring { width: 64px; height: 64px; font-size: 16.5px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Proof",
+  "tag": "section",
+  "class": "purelane-proof-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker",
+      "default": "Why it works"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tough on grime.<br>Gentle on everything else."
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body text",
+      "default": "Every formula is built on plant-derived cleansers and essential oils. It behaves exactly like the cleaner you are used to, minus the things you never signed up for."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "See the ingredient list"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "rotator_speed",
+      "label": "Rotator interval (ms)",
+      "min": 1500,
+      "max": 5000,
+      "step": 100,
+      "default": 2900
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Rotator product",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product image"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Product name",
+          "default": "Kitchen cleaner"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Short note",
+          "default": "Foam lifts grease, no scrubbing"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "99.9%"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Germ kill"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Tested against germs and bacteria"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Proof",
+      "blocks": [
+        { "type": "product", "settings": { "name": "Kitchen cleaner", "note": "Foam lifts grease, no scrubbing" } },
+        { "type": "product", "settings": { "name": "Tap & limescale", "note": "Melts hard water stains" } },
+        { "type": "product", "settings": { "name": "Laundry detergent", "note": "Tough on odour, soft on fabric" } },
+        { "type": "product", "settings": { "name": "Toilet cleaner", "note": "Kills 99.9% of germs" } },
+        { "type": "product", "settings": { "name": "Floor cleaner", "note": "Neem powered, pet safe" } },
+        { "type": "product", "settings": { "name": "Dishwash gel", "note": "Cuts grease, kind to hands" } },
+        { "type": "stat", "settings": { "value": "99.9%", "label": "Germ kill", "description": "Tested against germs and bacteria" } },
+        { "type": "stat", "settings": { "value": "0%", "label": "Sulphates", "description": "No SLS, chlorine or parabens" } },
+        { "type": "stat", "settings": { "value": "100%", "label": "Plant based", "description": "Cleansers derived from plants" } },
+        { "type": "stat", "settings": { "value": "4.8", "label": "Rated", "description": "Across 8,000+ verified reviews" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

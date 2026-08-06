@@ -1,0 +1,145 @@
+{%- liquid
+  assign speed = section.settings.speed
+  assign messages = section.blocks
+-%}
+
+{%- if messages.size > 0 -%}
+<div class="pl-ticker purelane-section" aria-hidden="true">
+  <div class="pl-ticker__track" style="animation-duration: {{ speed }}s;">
+    {%- for block in messages -%}
+      <span {{ block.shopify_attributes }}>
+        {{ block.settings.text_before }}
+        {%- if block.settings.text_bold != blank -%}
+          <b>{{ block.settings.text_bold }}</b>
+        {%- endif -%}
+      </span>
+    {%- endfor -%}
+    {%- comment %} Duplicate for seamless loop {% endcomment -%}
+    {%- for block in messages -%}
+      <span>
+        {{ block.settings.text_before }}
+        {%- if block.settings.text_bold != blank -%}
+          <b>{{ block.settings.text_bold }}</b>
+        {%- endif -%}
+      </span>
+    {%- endfor -%}
+  </div>
+</div>
+{%- endif -%}
+
+<style>
+  .pl-ticker {
+    position: relative;
+    z-index: 40;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.74);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(75, 58, 143, 0.12);
+    color: var(--pl-paper-2);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  .pl-ticker b {
+    color: var(--pl-green);
+    font-weight: 700;
+  }
+
+  .pl-ticker__track {
+    display: inline-flex;
+    gap: 40px;
+    padding: 9px 20px;
+    animation: pl-tick linear infinite;
+  }
+
+  @keyframes pl-tick {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pl-ticker__track {
+      animation: none;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Ticker",
+  "tag": "section",
+  "class": "purelane-ticker-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed (seconds)",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "default": 30,
+      "info": "Lower = faster scroll."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text_before",
+          "label": "Text",
+          "default": "Free shipping"
+        },
+        {
+          "type": "text",
+          "id": "text_bold",
+          "label": "Bold highlight",
+          "default": "on every bundle across India"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Ticker",
+      "blocks": [
+        {
+          "type": "message",
+          "settings": {
+            "text_before": "Free shipping",
+            "text_bold": "on every bundle across India"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text_before": "100% plant-based",
+            "text_bold": "and non-toxic"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text_before": "Loved by",
+            "text_bold": "30,000+ happy homes"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text_before": "Buy 3",
+            "text_bold": "at flat \u20b9499"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

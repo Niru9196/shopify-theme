@@ -1,0 +1,319 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign footnote = section.settings.footnote
+  assign combos = section.blocks
+-%}
+
+<section class="pl-sec purelane-section" id="pl-combos" data-scene="3">
+  <div class="pl-wrap">
+    <div class="pl-panel-head pl-rv">
+      {%- if kicker != blank -%}<span class="pl-kicker">{{ kicker }}</span>{%- endif -%}
+      <h2 class="pl-d2" style="margin-top:12px">{{ heading }}</h2>
+      <div class="pl-rule"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-6.5 3.5-11 8-12.5C20 15 16.5 20 12 21Z"/><path d="M12 21C12 14.5 8.5 10 4 8.5 4 15 7.5 20 12 21Z"/></svg><i></i></div>
+      {%- if subtitle != blank -%}
+        <p class="pl-lede" style="margin:14px auto 0">{{ subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if combos.size > 0 -%}
+      <div class="pl-comborail pl-rv">
+        {%- for block in combos -%}
+          <article class="pl-glass pl-combo{% if block.settings.featured %} pl-combo--hero{% endif %}" {{ block.shopify_attributes }}>
+            <div class="pl-combo__tray">
+              <span class="pl-combo__save">{{ block.settings.savings_text }}</span>
+              {%- if block.settings.flag != blank -%}
+                <span class="pl-combo__flag">{{ block.settings.flag }}</span>
+              {%- endif -%}
+              <div class="pl-combo__stack">
+                {%- if block.settings.image_1 != blank -%}
+                  <span class="pl-combo__it">
+                    <img src="{{ block.settings.image_1 | image_url: width: 200 }}" alt="{{ block.settings.label_1 }}" class="pl-combo__pimg" loading="lazy" width="66" height="auto">
+                    <span>{{ block.settings.label_1 }}</span>
+                  </span>
+                {%- endif -%}
+                {%- if block.settings.image_2 != blank -%}
+                  <span class="pl-combo__plus" aria-hidden="true">+</span>
+                  <span class="pl-combo__it">
+                    <img src="{{ block.settings.image_2 | image_url: width: 200 }}" alt="{{ block.settings.label_2 }}" class="pl-combo__pimg" loading="lazy" width="66" height="auto">
+                    <span>{{ block.settings.label_2 }}</span>
+                  </span>
+                {%- endif -%}
+                {%- if block.settings.image_3 != blank -%}
+                  <span class="pl-combo__plus" aria-hidden="true">+</span>
+                  <span class="pl-combo__it">
+                    <img src="{{ block.settings.image_3 | image_url: width: 200 }}" alt="{{ block.settings.label_3 }}" class="pl-combo__pimg" loading="lazy" width="66" height="auto">
+                    <span>{{ block.settings.label_3 }}</span>
+                  </span>
+                {%- endif -%}
+              </div>
+            </div>
+            <div class="pl-combo__body">
+              <h3>{{ block.settings.title }}</h3>
+              <div class="pl-combo__cnt">{{ block.settings.product_count }} products</div>
+              {%- if block.settings.includes != blank -%}
+                <p class="pl-combo__inc">{{ block.settings.includes }}</p>
+              {%- endif -%}
+              <div class="pl-combo__prow">
+                <strong>{{ block.settings.price }}</strong>
+                {%- if block.settings.compare_price != blank -%}<s>{{ block.settings.compare_price }}</s>{%- endif -%}
+                {%- if block.settings.savings_badge != blank -%}<em>{{ block.settings.savings_badge }}</em>{%- endif -%}
+              </div>
+              <div class="pl-combo__fine">Inclusive of all taxes &middot; COD available</div>
+              <a class="pl-btn {% if block.settings.featured %}pl-btn-primary{% else %}pl-btn-ghost{% endif %}" href="{{ block.settings.link }}">
+                Shop bundle
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+              </a>
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+      <div class="pl-swipecue" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        Swipe for more combos
+      </div>
+    {%- endif -%}
+
+    {%- if footnote != blank -%}
+      <p class="pl-railnote">{{ footnote }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .pl-comborail {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    margin: 0 -18px;
+    padding: 4px 18px 14px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pl-comborail::-webkit-scrollbar { display: none; }
+
+  .pl-combo {
+    flex: 0 0 302px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    transition: 0.4s var(--pl-ease);
+  }
+  .pl-combo:hover { transform: translateY(-5px); }
+  .pl-combo--hero {
+    border-color: rgba(201,118,29,.46);
+    box-shadow: 0 22px 54px rgba(58,44,112,.14), 0 0 0 1px rgba(201,118,29,.24), var(--pl-g-inset);
+  }
+
+  .pl-combo__tray {
+    padding: 14px 14px 13px;
+    border-bottom: 1px solid rgba(75,58,143,.12);
+    position: relative;
+    background: linear-gradient(162deg, rgba(255,255,255,.56), rgba(236,230,247,.34));
+  }
+  .pl-combo__save {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.84);
+    border: 1px solid rgba(201,118,29,.34);
+    color: var(--pl-green);
+    margin-bottom: 13px;
+  }
+  .pl-combo__flag {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 8.6px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #00706a, #004b46);
+    color: #f4fdf6;
+  }
+
+  .pl-combo__stack {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .pl-combo__it {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+  }
+  .pl-combo__pimg {
+    height: 66px;
+    width: auto;
+    margin: 0 auto 8px;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 8px rgba(0,74,66,.13));
+  }
+  .pl-combo__it span {
+    display: block;
+    font-size: 8.6px;
+    line-height: 1.32;
+    color: var(--pl-paper-2);
+    font-weight: 600;
+  }
+  .pl-combo__plus {
+    flex: 0 0 9px;
+    color: var(--pl-accent);
+    font-weight: 800;
+    font-size: 12px;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+
+  .pl-combo__body {
+    padding: 15px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .pl-combo__body h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 1.1;
+    color: var(--pl-surface);
+  }
+  .pl-combo__cnt {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pl-paper-3);
+    margin-top: 6px;
+  }
+  .pl-combo__inc {
+    font-size: 12.4px;
+    color: var(--pl-paper-2);
+    line-height: 1.55;
+    margin: 11px 0 14px;
+    flex: 1;
+  }
+  .pl-combo__prow {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .pl-combo__prow strong {
+    font-family: 'Outfit', sans-serif;
+    font-size: 25px;
+    font-weight: 800;
+    color: var(--pl-surface);
+    letter-spacing: -0.02em;
+  }
+  .pl-combo__prow s { font-size: 13px; color: var(--pl-paper-3); }
+  .pl-combo__prow em {
+    font-style: normal;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(201,118,29,.14);
+    border: 1px solid rgba(201,118,29,.34);
+    color: var(--pl-green);
+  }
+  .pl-combo__fine {
+    font-size: 10.4px;
+    color: var(--pl-paper-3);
+    margin-bottom: 14px;
+  }
+  .pl-combo .pl-btn { width: 100%; justify-content: center; }
+
+  .pl-swipecue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--pl-paper-3);
+    margin-top: 2px;
+  }
+  .pl-swipecue svg { width: 14px; height: 14px; color: var(--pl-accent); }
+
+  .pl-railnote {
+    text-align: center;
+    font-size: 12px;
+    color: var(--pl-paper-3);
+    margin-top: 14px;
+    max-width: 62ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (max-width: 760px) {
+    .pl-combo { flex: 0 0 268px; }
+    .pl-combo__pimg { height: 56px; }
+    .pl-comborail { margin: 0 -14px; padding: 4px 14px 12px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Combos",
+  "tag": "section",
+  "class": "purelane-combos-section",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "Pre-built to save you money" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Best selling combos" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Swipe through the boxes people order most. Each one is already priced below buying the same products on their own." },
+    { "type": "textarea", "id": "footnote", "label": "Footnote", "default": "Tapping \"Shop bundle\" opens the bundle picker with these products already added. You can still swap anything before you pay." }
+  ],
+  "blocks": [
+    {
+      "type": "combo",
+      "name": "Combo card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Kitchen essentials" },
+        { "type": "text", "id": "savings_text", "label": "Savings badge (top)", "default": "You save ₹398" },
+        { "type": "text", "id": "flag", "label": "Flag (corner)", "default": "Most popular" },
+        { "type": "checkbox", "id": "featured", "label": "Featured (highlight border)", "default": false },
+        { "type": "range", "id": "product_count", "label": "Product count", "min": 2, "max": 5, "default": 3 },
+        { "type": "image_picker", "id": "image_1", "label": "Product 1 image" },
+        { "type": "text", "id": "label_1", "label": "Product 1 label", "default": "Cuts grease instantly" },
+        { "type": "image_picker", "id": "image_2", "label": "Product 2 image" },
+        { "type": "text", "id": "label_2", "label": "Product 2 label", "default": "Squeaky clean dishes" },
+        { "type": "image_picker", "id": "image_3", "label": "Product 3 image" },
+        { "type": "text", "id": "label_3", "label": "Product 3 label", "default": "Melts hard water stains" },
+        { "type": "textarea", "id": "includes", "label": "Includes text", "default": "Includes: Foaming Kitchen Cleaner, Dishwash Gel & Tap Cleaner." },
+        { "type": "text", "id": "price", "label": "Price", "default": "₹499" },
+        { "type": "text", "id": "compare_price", "label": "Compare price", "default": "₹897" },
+        { "type": "text", "id": "savings_badge", "label": "Savings inline badge", "default": "Save ₹398" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Combos",
+      "blocks": [
+        { "type": "combo", "settings": { "title": "Kitchen essentials", "savings_text": "You save ₹398", "flag": "Most popular", "featured": false, "product_count": 3, "label_1": "Cuts grease instantly", "label_2": "Squeaky clean dishes", "label_3": "Melts hard water stains", "includes": "Includes: Foaming Kitchen Cleaner, Dishwash Gel & Tap Cleaner.", "price": "₹499", "compare_price": "₹897", "savings_badge": "Save ₹398" } },
+        { "type": "combo", "settings": { "title": "Complete home bundle", "savings_text": "Biggest saving", "flag": "Best value", "featured": true, "product_count": 5, "label_1": "Cuts grease instantly", "label_2": "Kills 99.9% germs", "label_3": "Gentle hydration for hands", "includes": "Includes: Kitchen Cleaner, Laundry Detergent, Floor Cleaner, Toilet Cleaner & Handwash.", "price": "₹799", "compare_price": "₹1,495", "savings_badge": "Save ₹696" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

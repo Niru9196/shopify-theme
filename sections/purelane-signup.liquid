@@ -1,0 +1,71 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign heading = section.settings.heading
+  assign subtitle = section.settings.subtitle
+  assign cta_text = section.settings.cta_text
+-%}
+
+<section class="pl-sec purelane-section" data-scene="4">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-signup pl-rv">
+      {%- if kicker != blank -%}<span class="pl-kicker">{{ kicker }}</span>{%- endif -%}
+      <h2 class="pl-d2" style="margin-top:12px">{{ heading }}</h2>
+      {%- if subtitle != blank -%}
+        <p class="pl-lede" style="margin:0 auto">{{ subtitle }}</p>
+      {%- endif -%}
+
+      {%- form 'customer', id: 'pl-signup-form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="pl-signup__form">
+          <input
+            type="email"
+            name="contact[email]"
+            placeholder="your@email.com"
+            aria-label="Email address"
+            required
+            autocomplete="email"
+          >
+          <button class="pl-btn pl-btn-primary" type="submit">{{ cta_text }}</button>
+        </div>
+        {%- if form.posted_successfully? -%}
+          <p class="pl-signup__success" role="status">Thanks! Check your inbox for the code.</p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pl-signup { padding: clamp(28px, 4vw, 46px); text-align: center; }
+  .pl-signup .pl-d2 { margin-bottom: 12px; }
+
+  .pl-signup__form {
+    display: flex; gap: 9px; max-width: 430px; margin: 22px auto 0; flex-wrap: wrap;
+  }
+  .pl-signup__form input[type="email"] {
+    flex: 1; min-width: 180px; height: 46px; padding: 0 18px; border-radius: 999px;
+    font-size: 14px; font-family: inherit; color: #01423b;
+    background: rgba(255,255,255,.72); border: 1px solid rgba(75,58,143,.20);
+  }
+  .pl-signup__form input::placeholder { color: var(--pl-paper-3); }
+  .pl-signup__form input:focus { outline: none; border-color: var(--pl-accent); background: #fff; }
+
+  .pl-signup__success {
+    margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--pl-green);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Signup",
+  "tag": "section",
+  "class": "purelane-signup-section",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "Join the Purelane Club" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get ₹100 off your first bundle" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Plus first access to new launches and restocks." },
+    { "type": "text", "id": "cta_text", "label": "Button text", "default": "Get my ₹100 off" }
+  ],
+  "presets": [{ "name": "Purelane Signup" }]
+}
+{% endschema %}

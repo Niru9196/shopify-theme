@@ -1,0 +1,58 @@
+{%- liquid
+  assign title = section.settings.title
+  assign subtitle = section.settings.subtitle
+  assign cta_text = section.settings.cta_text
+  assign cta_url = section.settings.cta_url
+-%}
+
+<div class="pl-sticky purelane-section">
+  <span class="pl-sticky__lbl">
+    <b>{{ title }}</b>
+    <span>{{ subtitle }}</span>
+  </span>
+  <a class="pl-btn pl-btn-primary pl-btn-sm" href="{{ cta_url }}">{{ cta_text }}</a>
+</div>
+
+<style>
+  .pl-sticky {
+    position: fixed;
+    left: 0; right: 0; bottom: 0; z-index: 48;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(75,58,143,.14);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pl-sticky__lbl { line-height: 1.2; }
+  .pl-sticky__lbl b {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pl-surface);
+  }
+  .pl-sticky__lbl span { font-size: 10.5px; color: var(--pl-paper-3); }
+  .pl-sticky .pl-btn { margin-left: auto; }
+
+  @media (min-width: 960px) { .pl-sticky { display: none; } }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Sticky CTA",
+  "tag": "section",
+  "class": "purelane-sticky-section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Pick any 3, pay ₹499" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Free shipping, always" },
+    { "type": "text", "id": "cta_text", "label": "Button text", "default": "Build bundle" },
+    { "type": "url", "id": "cta_url", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Purelane Sticky CTA" }]
+}
+{% endschema %}

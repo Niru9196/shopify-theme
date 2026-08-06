@@ -1,0 +1,98 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign heading = section.settings.heading
+  assign cats = section.blocks
+-%}
+
+<section class="pl-sec purelane-section" id="pl-categories" data-scene="4">
+  <div class="pl-wrap">
+    <div class="pl-panel-head pl-rv">
+      {%- if kicker != blank -%}<span class="pl-kicker">{{ kicker }}</span>{%- endif -%}
+      <h2 class="pl-d2" style="margin-top:12px">{{ heading }}</h2>
+    </div>
+    {%- if cats.size > 0 -%}
+      <div class="pl-cats">
+        {%- for block in cats -%}
+          <a class="pl-glass pl-cat pl-rv{% if forloop.index > 1 %} pl-rv-d{{ forloop.index | minus: 1 }}{% endif %}" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+            <span class="pl-cat__ph">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 360 }}" alt="{{ block.settings.title }}" class="pl-cat__img" loading="lazy" width="176" height="auto">
+              {%- endif -%}
+            </span>
+            <span class="pl-cat__txt">
+              <h4>{{ block.settings.title }}</h4>
+              <p>{{ block.settings.subtitle }}</p>
+            </span>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .pl-cats { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 900px) { .pl-cats { grid-template-columns: repeat(4, 1fr); } }
+
+  .pl-cat { padding: 0; display: flex; flex-direction: column; transition: 0.4s var(--pl-ease); text-decoration: none; }
+  .pl-cat:hover { transform: translateY(-5px); }
+
+  .pl-cat__ph {
+    height: 194px; display: flex; align-items: flex-end; justify-content: center; padding: 14px 12px 0; position: relative;
+  }
+  .pl-cat__ph::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(110% 80% at 50% 6%, rgba(255,255,255,.66), rgba(236,230,247,.30) 58%, transparent 80%);
+  }
+  .pl-cat__img {
+    position: relative; height: 176px; width: auto; object-fit: contain;
+    filter: drop-shadow(0 10px 15px rgba(0,74,66,.14));
+  }
+
+  .pl-cat__txt { padding: 14px 16px 18px; border-top: 1px solid rgba(75,58,143,.11); }
+  .pl-cat__txt h4 {
+    font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em; color: var(--pl-surface); margin-bottom: 5px;
+  }
+  .pl-cat__txt p { font-size: 11.8px; color: var(--pl-paper-3); }
+
+  @media (max-width: 760px) {
+    .pl-cat__ph { height: 158px; }
+    .pl-cat__img { height: 142px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Categories",
+  "tag": "section",
+  "class": "purelane-categories-section",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "Bundle categories" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find the right bundle for you" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Kitchen bundle" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Grease, dishes & more" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Categories",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Kitchen bundle", "subtitle": "Grease, dishes & more" } },
+        { "type": "category", "settings": { "title": "Bathroom bundle", "subtitle": "Deep clean & disinfect" } },
+        { "type": "category", "settings": { "title": "Laundry bundle", "subtitle": "Softer, fresher wash" } },
+        { "type": "category", "settings": { "title": "Hard water bundle", "subtitle": "Melt away limescale" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

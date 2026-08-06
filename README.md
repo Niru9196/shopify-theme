@@ -1,99 +1,81 @@
-# Dawn
+# Purelane Homepage — Shopify Dawn Build
 
-[![Build status](https://github.com/shopify/dawn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Shopify/dawn/actions/workflows/ci.yml?query=branch%3Amain)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?color=informational)](/.github/CONTRIBUTING.md)
+A pixel-accurate translation of `purelane-homepage.html` into a fully merchant-editable Shopify Online Store 2.0 theme, built on Dawn.
 
-[Getting started](#getting-started) |
-[Staying up to date with Dawn changes](#staying-up-to-date-with-dawn-changes) |
-[Developer tools](#developer-tools) |
-[Contributing](#contributing) |
-[Code of conduct](#code-of-conduct) |
-[Theme Store submission](#theme-store-submission) |
-[License](#license)
+---
 
-Dawn represents a HTML-first, JavaScript-only-as-needed approach to theme development. It's Shopify's first source available theme with performance, flexibility, and [Online Store 2.0 features](https://www.shopify.com/partners/blog/shopify-online-store) built-in and acts as a reference for building Shopify themes.
+## Build Notes
 
-* **Web-native in its purest form:** Themes run on the [evergreen web](https://www.w3.org/2001/tag/doc/evergreen-web/). We leverage the latest web browsers to their fullest, while maintaining support for the older ones through progressive enhancement—not polyfills.
-* **Lean, fast, and reliable:** Functionality and design defaults to “no” until it meets this requirement. Code ships on quality. Themes must be built with purpose. They shouldn’t support each and every feature in Shopify.
-* **Server-rendered:** HTML must be rendered by Shopify servers using Liquid. Business logic and platform primitives such as translations and money formatting don’t belong on the client. Async and on-demand rendering of parts of the page is OK, but we do it sparingly as a progressive enhancement.
-* **Functional, not pixel-perfect:** The Web doesn’t require each page to be rendered pixel-perfect by each browser engine. Using semantic markup, progressive enhancement, and clever design, we ensure that themes remain functional regardless of the browser.
+### What I flagged in the original HTML
 
-You can find a more detailed version of our theme code principles in the [contribution guide](https://github.com/Shopify/dawn/blob/main/.github/CONTRIBUTING.md#theme-code-principles).
+- Single monolithic file (~1,700 lines) with all CSS, SVG, and JS inline. No separation of concerns, not deployable to Shopify as-is.
+- Product images are base64 SVG placeholders embedded in CSS custom properties. Works for the reference but needs real image assets in production.
+- The HTML uses a dual palette (dark variables defined first, then overridden with light-mode values in a second `<style>` block). Only the light mode is live — the dark vars are dead code.
+- Scroll-driven scene crossfade relies on `offsetTop` walking, which can be brittle if DOM structure changes. I preserved the logic but scoped it to a custom element.
+- The `position: fixed` underwater background means the entire page content must sit at `z-index: 2+`. This works but requires awareness when adding new sections.
 
-## Getting started
-We recommend using Dawn as a starting point for theme development. [Learn more on Shopify.dev](https://shopify.dev/themes/getting-started/create).
+### What I changed and why
 
-> If you're building a theme for the Shopify Theme Store, then you can use Dawn as a starting point. However, the theme that you submit needs to be [substantively different from Dawn](https://shopify.dev/themes/store/requirements#uniqueness) so that it provides added value for merchants. Learn about the [ways that you can use Dawn](https://shopify.dev/themes/tools/dawn#ways-to-use-dawn).
+| Decision | Reason |
+|----------|--------|
+| Prefixed all classes with `pl-` | Avoids collision with Dawn's existing base.css and component styles |
+| Split into 16 sections with individual schemas | Each section is independently reorderable, removable, and configurable in the theme editor |
+| Extracted shared tokens into `purelane-base.css` | Single source of truth for palette, type scale, glass effects — change once, applies everywhere |
+| Built JS as Web Components (`<purelane-scenes>`, `<purelane-hero-stage>`, `<purelane-rotator>`) | Scoped lifecycle, no globals, graceful no-op if markup is absent |
+| Used scoped `<style>` blocks for most sections instead of one giant CSS file | Only loads CSS for sections actually on the page; better for CWV |
+| Signup form uses Shopify's `{% form 'customer' %}` | Real email capture without third-party scripts; works with Klaviyo if synced via Shopify customer tags |
+| Shop section accepts a collection handle OR manual blocks | Works on day one even without products in the store |
 
-Please note that the main branch may include code for features not yet released. The "stable" version of Dawn is available in the theme store.
+### What doesn't match the HTML (intentionally)
 
-## Staying up to date with Dawn changes
+- **No inline base64 product images.** The HTML bakes product art as CSS custom properties. In the theme, product images come from Shopify's CDN via `image_url` filter. Merchants upload real photos.
+- **No hardcoded navigation.** The original HTML has a bespoke nav pill. This build defers to Dawn's existing header section group — keeps cart, search, and mega-menu logic intact.
+- **No footer rebuild.** Same reasoning — Dawn's footer handles payment icons, locale selectors, and policies. No value in duplicating that.
+- **Bundle tier features use pipe-separated text** (e.g. `"Pick any two|Free shipping"`) instead of nested blocks. Shopify doesn't support blocks-inside-blocks, and this keeps the editor clean.
 
-Say you're building a new theme off Dawn but you still want to be able to pull in the latest changes, you can add a remote `upstream` pointing to this Dawn repository.
+### Semantics & Accessibility
 
-1. Navigate to your local theme folder.
-2. Verify the list of remotes and validate that you have both an `origin` and `upstream`:
+- All decorative SVGs carry `aria-hidden="true"`
+- Interactive controls (dots, buttons) have `aria-label`
+- Marquees and auto-advancing elements pause on hover and focus-within
+- `prefers-reduced-motion: reduce` disables all animations and reveals instantly
+- Focus-visible ring: 2px solid green, 3px offset, 6px radius — visible on keyboard, invisible on click
+- Review cards in the duplicated half of the marquee are marked `aria-hidden="true"` to prevent screen readers from reading content twice
+- Email input has `autocomplete="email"` and a visible label via placeholder + aria-label
+
+### How it works
+
+1. **Scenes section** renders first. It loads `purelane-base.css`, Google Fonts, and the fixed underwater background. Its custom element (`<purelane-scenes>`) also handles the IntersectionObserver that reveals `.pl-rv` elements site-wide.
+2. **Each content section** carries a `data-scene="1|2|3|4"` attribute. As the user scrolls, the scenes JS detects which zone is at the viewport midpoint and crossfades the background gradient.
+3. **Parallax** is driven by `mousemove` (desktop) and `scrollY` — CSS custom properties `--px` and `--py` on each water layer.
+4. **The hero stage** auto-advances slides (1 product → 2 → 3) via `<purelane-hero-stage>`. It pauses when out of viewport or on hover.
+5. **The product rotator** in the proof section cycles images with a caption + dot indicator.
+6. **All sections are independent.** Remove one in the theme editor — nothing else breaks.
+
+### With more time I would
+
+- Replace the SVG ingredient illustrations with Lottie or animated SVGs that respond to scroll position
+- Add a progress rail (the vertical dot nav from the HTML) as its own section with `position: fixed` and scroll-spy
+- Build a proper drawer/modal for the "Build this box" flow rather than linking to a collection
+- Wire the product cards to Shopify's AJAX cart API (add-to-cart without page reload)
+- Add structured data (JSON-LD) for Product and AggregateRating
+- Performance audit with Lighthouse and tune LCP (preload hero image, inline critical CSS above the fold)
+- Add theme editor live-preview JS (`Shopify.designMode` listeners) so block reordering reflects instantly
+
+---
+
+## Running locally
+
 ```sh
-git remote -v
+shopify theme dev --store your-store.myshopify.com
 ```
-3. If you don't see an `upstream`, you can add one that points to Shopify's Dawn repository:
+
+## Deploying
+
 ```sh
-git remote add upstream https://github.com/Shopify/dawn.git
+shopify theme push --theme-id THEME_ID
 ```
-4. Pull in the latest Dawn changes into your repository:
-```sh
-git fetch upstream
-git pull upstream main
-```
-
-## Developer tools
-
-There are a number of really useful tools that the Shopify Themes team uses during development. Dawn is already set up to work with these tools.
-
-### Shopify CLI
-
-[Shopify CLI](https://github.com/Shopify/shopify-cli) helps you build Shopify themes faster and is used to automate and enhance your local development workflow. It comes bundled with a suite of commands for developing Shopify themes—everything from working with themes on a Shopify store (e.g. creating, publishing, deleting themes) or launching a development server for local theme development.
-
-You can follow this [quick start guide for theme developers](https://shopify.dev/docs/themes/tools/cli) to get started.
-
-### Theme Check
-
-We recommend using [Theme Check](https://github.com/shopify/theme-check) as a way to validate and lint your Shopify themes.
-
-We've added Theme Check to Dawn's [list of VS Code extensions](/.vscode/extensions.json) so if you're using Visual Studio Code as your code editor of choice, you'll be prompted to install the [Theme Check VS Code](https://marketplace.visualstudio.com/items?itemName=Shopify.theme-check-vscode) extension upon opening VS Code after you've forked and cloned Dawn.
-
-You can also run it from a terminal with the following Shopify CLI command:
-
-```bash
-shopify theme check
-```
-
-### Continuous Integration
-
-Dawn uses [GitHub Actions](https://github.com/features/actions) to maintain the quality of the theme. [This is a starting point](https://github.com/Shopify/dawn/blob/main/.github/workflows/ci.yml) and what we suggest to use in order to ensure you're building better themes. Feel free to build off of it!
-
-#### Shopify/lighthouse-ci-action
-
-We love fast websites! Which is why we created [Shopify/lighthouse-ci-action](https://github.com/Shopify/lighthouse-ci-action). This runs a series of [Google Lighthouse](https://developers.google.com/web/tools/lighthouse) audits for the home, product and collections pages on a store to ensure code that gets added doesn't degrade storefront performance over time.
-
-#### Shopify/theme-check-action
-
-Dawn runs [Theme Check](#Theme-Check) on every commit via [Shopify/theme-check-action](https://github.com/Shopify/theme-check-action).
-
-## Contributing
-
-Want to make commerce better for everyone by contributing to Dawn? We'd love your help! Please read our [contributing guide](https://github.com/Shopify/dawn/blob/main/.github/CONTRIBUTING.md) to learn about our development process, how to propose bug fixes and improvements, and how to build for Dawn.
-
-## Code of conduct
-
-All developers who wish to contribute through code or issues, please first read our [Code of Conduct](https://github.com/Shopify/dawn/blob/main/.github/CODE_OF_CONDUCT.md).
-
-## Theme Store submission
-
-The [Shopify Theme Store](https://themes.shopify.com/) is the place where Shopify merchants find the themes that they'll use to showcase and support their business. As a theme partner, you can create themes for the Shopify Theme Store and reach an international audience of an ever-growing number of entrepreneurs.
-
-Ensure that you follow the list of [theme store requirements](https://shopify.dev/themes/store/requirements) if you're interested in becoming a [Shopify Theme Partner](https://themes.shopify.com/services/themes/guidelines) and building themes for the Shopify platform.
 
 ## License
 
-Copyright (c) 2021-present Shopify Inc. See [LICENSE](/LICENSE.md) for further details.
+Based on [Dawn](https://github.com/Shopify/dawn) by Shopify. See [LICENSE.md](/LICENSE.md).

@@ -1,0 +1,177 @@
+{%- liquid
+  assign heading = section.settings.heading
+  assign kicker = section.settings.kicker
+  assign collection_handle = section.settings.collection
+  assign limit = section.settings.limit
+-%}
+
+<section class="pl-sec purelane-section" id="pl-shop" data-scene="3">
+  <div class="pl-wrap">
+    <div class="pl-panel-head pl-rv">
+      {%- if kicker != blank -%}<span class="pl-kicker">{{ kicker }}</span>{%- endif -%}
+      <h2 class="pl-d2" style="margin-top:12px">{{ heading }}</h2>
+      <div class="pl-rule"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-6.5 3.5-11 8-12.5C20 15 16.5 20 12 21Z"/><path d="M12 21C12 14.5 8.5 10 4 8.5 4 15 7.5 20 12 21Z"/></svg><i></i></div>
+    </div>
+
+    <div class="pl-shelf">
+      {%- if collection_handle != blank -%}
+        {%- assign coll = collections[collection_handle] -%}
+        {%- for product in coll.products limit: limit -%}
+          <article class="pl-glass pl-card pl-rv{% if forloop.index > 1 %} pl-rv-d{{ forloop.index | minus: 1 }}{% endif %}">
+            <div class="pl-card__shot">
+              {%- if product.metafields.custom.badge != blank -%}
+                <span class="pl-card__pill">{{ product.metafields.custom.badge }}</span>
+              {%- elsif forloop.index <= 2 -%}
+                <span class="pl-card__pill">Best seller</span>
+              {%- endif -%}
+              {%- if product.featured_image != blank -%}
+                <img
+                  src="{{ product.featured_image | image_url: width: 400 }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  width="200"
+                  height="auto"
+                  loading="lazy"
+                  class="pl-card__img"
+                >
+              {%- endif -%}
+            </div>
+            <h4>{{ product.title }}</h4>
+            <div class="pl-card__rate"><b>★ {{ product.metafields.reviews.rating.value | default: '4.8' }}</b> · {{ product.metafields.reviews.rating_count | default: '200+' }} reviews</div>
+            <div class="pl-card__pr">
+              <strong>{{ product.price | money }}</strong>
+              {%- if product.compare_at_price > product.price -%}
+                <s>{{ product.compare_at_price | money }}</s>
+                {%- assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                <em>{{ savings }}% off</em>
+              {%- endif -%}
+            </div>
+            <a href="{{ product.url }}" class="pl-btn pl-btn-ghost pl-btn-sm">Add to cart</a>
+          </article>
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment %} Fallback: manual blocks if no collection set {% endcomment -%}
+        {%- for block in section.blocks -%}
+          <article class="pl-glass pl-card pl-rv{% if forloop.index > 1 %} pl-rv-d{{ forloop.index | minus: 1 }}{% endif %}" {{ block.shopify_attributes }}>
+            <div class="pl-card__shot">
+              {%- if block.settings.badge != blank -%}
+                <span class="pl-card__pill">{{ block.settings.badge }}</span>
+              {%- endif -%}
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}" width="200" height="auto" loading="lazy" class="pl-card__img">
+              {%- endif -%}
+            </div>
+            <h4>{{ block.settings.title }}</h4>
+            <div class="pl-card__rate"><b>★ {{ block.settings.rating }}</b> · {{ block.settings.review_count }} reviews</div>
+            <div class="pl-card__pr">
+              <strong>{{ block.settings.price }}</strong>
+              {%- if block.settings.compare_price != blank -%}<s>{{ block.settings.compare_price }}</s>{%- endif -%}
+              {%- if block.settings.discount != blank -%}<em>{{ block.settings.discount }}</em>{%- endif -%}
+            </div>
+            <a href="{{ block.settings.link }}" class="pl-btn pl-btn-ghost pl-btn-sm">Add to cart</a>
+          </article>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pl-shelf { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 860px) { .pl-shelf { grid-template-columns: repeat(4, 1fr); } }
+
+  .pl-card { padding: 16px; display: flex; flex-direction: column; transition: 0.4s var(--pl-ease); }
+  .pl-card:hover { transform: translateY(-5px); }
+
+  .pl-card__shot {
+    height: 150px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(255,255,255,.60), rgba(236,230,247,.42));
+    border: 1px solid rgba(75,58,143,.10);
+  }
+  .pl-card__img { height: 122px; width: auto; object-fit: contain; filter: drop-shadow(0 8px 13px rgba(0,74,66,.13)); }
+
+  .pl-card__pill {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(201,118,29,.34);
+    color: var(--pl-green);
+  }
+
+  .pl-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--pl-surface);
+    line-height: 1.2;
+    margin-bottom: 7px;
+  }
+
+  .pl-card__rate {
+    font-size: 11.5px;
+    color: var(--pl-paper-2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pl-card__rate b { color: var(--pl-accent); font-weight: 700; }
+
+  .pl-card__pr { margin-top: auto; display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+  .pl-card__pr strong { font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--pl-surface); font-weight: 700; }
+  .pl-card__pr s { font-size: 12px; color: var(--pl-paper-3); }
+  .pl-card__pr em { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: var(--pl-accent); }
+
+  .pl-card .pl-btn { width: 100%; justify-content: center; }
+
+  @media (max-width: 760px) {
+    .pl-card__shot { height: 126px; }
+    .pl-card__img { height: 108px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Shop",
+  "tag": "section",
+  "class": "purelane-shop-section",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "Bestsellers" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loved by 30,000 homes" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 12, "step": 2, "default": 8 }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product card (manual)",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Tap cleaner & limescale remover" },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Best seller" },
+        { "type": "text", "id": "rating", "label": "Rating", "default": "4.8" },
+        { "type": "text", "id": "review_count", "label": "Review count", "default": "237" },
+        { "type": "text", "id": "price", "label": "Price", "default": "₹200" },
+        { "type": "text", "id": "compare_price", "label": "Compare price", "default": "₹299" },
+        { "type": "text", "id": "discount", "label": "Discount text", "default": "33% off" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Purelane Shop" }]
+}
+{% endschema %}

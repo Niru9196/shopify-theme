@@ -3,8 +3,22 @@
   assign kicker = section.settings.kicker
   assign collection_handle = section.settings.collection
   assign limit = section.settings.limit
+  assign has_collection = false
+  assign has_blocks = false
+
+  if collection_handle != blank
+    assign coll = collections[collection_handle]
+    if coll.products.size > 0
+      assign has_collection = true
+    endif
+  endif
+
+  if section.blocks.size > 0
+    assign has_blocks = true
+  endif
 -%}
 
+{%- if has_collection or has_blocks -%}
 <section class="pl-sec purelane-section" id="pl-shop" data-scene="3">
   <div class="pl-wrap">
     <div class="pl-panel-head pl-rv">
@@ -14,15 +28,12 @@
     </div>
 
     <div class="pl-shelf">
-      {%- if collection_handle != blank -%}
-        {%- assign coll = collections[collection_handle] -%}
+      {%- if has_collection -%}
         {%- for product in coll.products limit: limit -%}
           <article class="pl-glass pl-card pl-rv{% if forloop.index > 1 %} pl-rv-d{{ forloop.index | minus: 1 }}{% endif %}">
             <div class="pl-card__shot">
               {%- if product.metafields.custom.badge != blank -%}
                 <span class="pl-card__pill">{{ product.metafields.custom.badge }}</span>
-              {%- elsif forloop.index <= 2 -%}
-                <span class="pl-card__pill">Best seller</span>
               {%- endif -%}
               {%- if product.featured_image != blank -%}
                 <img
@@ -36,7 +47,9 @@
               {%- endif -%}
             </div>
             <h4>{{ product.title }}</h4>
-            <div class="pl-card__rate"><b>★ {{ product.metafields.reviews.rating.value | default: '4.8' }}</b> · {{ product.metafields.reviews.rating_count | default: '200+' }} reviews</div>
+            {%- if product.metafields.reviews.rating.value != blank -%}
+              <div class="pl-card__rate"><b>★ {{ product.metafields.reviews.rating.value }}</b> · {{ product.metafields.reviews.rating_count }} reviews</div>
+            {%- endif -%}
             <div class="pl-card__pr">
               <strong>{{ product.price | money }}</strong>
               {%- if product.compare_at_price > product.price -%}
@@ -48,8 +61,7 @@
             <a href="{{ product.url }}" class="pl-btn pl-btn-ghost pl-btn-sm">Add to cart</a>
           </article>
         {%- endfor -%}
-      {%- else -%}
-        {%- comment %} Fallback: manual blocks if no collection set {% endcomment -%}
+      {%- elsif has_blocks -%}
         {%- for block in section.blocks -%}
           <article class="pl-glass pl-card pl-rv{% if forloop.index > 1 %} pl-rv-d{{ forloop.index | minus: 1 }}{% endif %}" {{ block.shopify_attributes }}>
             <div class="pl-card__shot">
@@ -60,20 +72,29 @@
                 <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}" width="200" height="auto" loading="lazy" class="pl-card__img">
               {%- endif -%}
             </div>
-            <h4>{{ block.settings.title }}</h4>
-            <div class="pl-card__rate"><b>★ {{ block.settings.rating }}</b> · {{ block.settings.review_count }} reviews</div>
-            <div class="pl-card__pr">
-              <strong>{{ block.settings.price }}</strong>
-              {%- if block.settings.compare_price != blank -%}<s>{{ block.settings.compare_price }}</s>{%- endif -%}
-              {%- if block.settings.discount != blank -%}<em>{{ block.settings.discount }}</em>{%- endif -%}
-            </div>
-            <a href="{{ block.settings.link }}" class="pl-btn pl-btn-ghost pl-btn-sm">Add to cart</a>
+            {%- if block.settings.title != blank -%}
+              <h4>{{ block.settings.title }}</h4>
+            {%- endif -%}
+            {%- if block.settings.rating != blank -%}
+              <div class="pl-card__rate"><b>★ {{ block.settings.rating }}</b>{%- if block.settings.review_count != blank %} · {{ block.settings.review_count }} reviews{%- endif -%}</div>
+            {%- endif -%}
+            {%- if block.settings.price != blank -%}
+              <div class="pl-card__pr">
+                <strong>{{ block.settings.price }}</strong>
+                {%- if block.settings.compare_price != blank -%}<s>{{ block.settings.compare_price }}</s>{%- endif -%}
+                {%- if block.settings.discount != blank -%}<em>{{ block.settings.discount }}</em>{%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="pl-btn pl-btn-ghost pl-btn-sm">Add to cart</a>
+            {%- endif -%}
           </article>
         {%- endfor -%}
       {%- endif -%}
     </div>
   </div>
 </section>
+{%- endif -%}
 
 <style>
   .pl-shelf { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
@@ -161,13 +182,13 @@
       "name": "Product card (manual)",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Tap cleaner & limescale remover" },
-        { "type": "text", "id": "badge", "label": "Badge", "default": "Best seller" },
-        { "type": "text", "id": "rating", "label": "Rating", "default": "4.8" },
-        { "type": "text", "id": "review_count", "label": "Review count", "default": "237" },
-        { "type": "text", "id": "price", "label": "Price", "default": "₹200" },
-        { "type": "text", "id": "compare_price", "label": "Compare price", "default": "₹299" },
-        { "type": "text", "id": "discount", "label": "Discount text", "default": "33% off" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "badge", "label": "Badge" },
+        { "type": "text", "id": "rating", "label": "Rating" },
+        { "type": "text", "id": "review_count", "label": "Review count" },
+        { "type": "text", "id": "price", "label": "Price" },
+        { "type": "text", "id": "compare_price", "label": "Compare price" },
+        { "type": "text", "id": "discount", "label": "Discount text" },
         { "type": "url", "id": "link", "label": "Link" }
       ]
     }

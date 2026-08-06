@@ -256,7 +256,7 @@
       "settings": {
         "kicker": "Bestsellers",
         "heading": "Loved by 30,000 homes",
-        "collection": "",
+        "collection": "all",
         "limit": 8
       }
     },

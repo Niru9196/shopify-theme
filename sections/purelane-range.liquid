@@ -1,0 +1,120 @@
+{%- liquid
+  assign kicker = section.settings.kicker
+  assign heading = section.settings.heading
+  assign body = section.settings.body
+  assign products = section.blocks
+-%}
+
+<section class="pl-sec purelane-section" id="pl-range" data-scene="3">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-range pl-rv">
+      <div class="pl-range__head">
+        <div>
+          {%- if kicker != blank -%}<span class="pl-kicker">{{ kicker }}</span>{%- endif -%}
+          <h2 class="pl-d2" style="margin-top:10px">{{ heading }}</h2>
+        </div>
+        {%- if body != blank -%}
+          <p class="pl-body-s" style="max-width:34ch;margin-bottom:4px">{{ body }}</p>
+        {%- endif -%}
+      </div>
+      {%- if products.size > 0 -%}
+        <div class="pl-range__strip">
+          <div class="pl-range__row">
+            {%- for block in products -%}
+              {%- if block.settings.image != blank -%}
+                <img
+                  src="{{ block.settings.image | image_url: width: 300 }}"
+                  alt="{{ block.settings.label | default: 'Purelane product' }}"
+                  class="pl-range__img"
+                  loading="lazy"
+                  width="132"
+                  height="auto"
+                  {{ block.shopify_attributes }}
+                >
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+        <p class="pl-range__hint">Swipe to see the full shelf</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pl-range { padding: clamp(20px, 2.6vw, 30px); }
+  .pl-range__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .pl-range__head .pl-d2 { max-width: 20ch; }
+
+  .pl-range__strip {
+    margin: 10px 0 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .pl-range__strip::-webkit-scrollbar { display: none; }
+
+  .pl-range__row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 150px;
+  }
+  .pl-range__img {
+    height: 132px;
+    width: auto;
+    object-fit: contain;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 9px 14px rgba(0,74,66,.14));
+  }
+  .pl-range__img:nth-child(even) { height: 118px; }
+
+  .pl-range__hint {
+    font-size: 11px;
+    color: var(--pl-paper-3);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .pl-range__strip { margin: 6px -14px 0; padding: 0 14px 6px; }
+    .pl-range__row { min-height: 132px; justify-content: flex-start; gap: 10px; }
+    .pl-range__img { height: 116px; }
+    .pl-range__img:nth-child(even) { height: 104px; }
+  }
+
+  @media (min-width: 761px) { .pl-range__hint { display: none; } }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Range",
+  "tag": "section",
+  "class": "purelane-range-section",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "The full range" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Every room, one shelf" },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "Floors, taps, kitchen, laundry, bathroom and hands. Fourteen plant-based formulas that replace every harsh bottle under your sink." }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Product image" },
+        { "type": "text", "id": "label", "label": "Alt text", "default": "Purelane product" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Purelane Range" }]
+}
+{% endschema %}

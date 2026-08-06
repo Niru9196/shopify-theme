@@ -1,0 +1,76 @@
+{%- liquid
+  assign items = section.blocks
+-%}
+
+{%- if items.size > 0 -%}
+<section class="pl-sec purelane-section" data-scene="4">
+  <div class="pl-wrap">
+    <div class="pl-glass pl-trust pl-rv">
+      {%- for block in items -%}
+        <div class="pl-trust__item" {{ block.shopify_attributes }}>
+          {%- case block.settings.icon -%}
+            {%- when 'leaf' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-6.5 3.5-11 8-12.5C20 15 16.5 20 12 21Z"/><path d="M12 21C12 14.5 8.5 10 4 8.5 4 15 7.5 20 12 21Z"/></svg>
+            {%- when 'recycle' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M4 8 6.5 3h11L20 8M9.5 12h5"/></svg>
+            {%- when 'heart' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9.4A4.1 4.1 0 0 1 12 8a4.1 4.1 0 0 1 7 2.6c0 5-7 9.4-7 9.4Z"/></svg>
+            {%- when 'globe' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.4 2.4 3.6 5.4 3.6 8.6S14.4 18.2 12 20.6c-2.4-2.4-3.6-5.4-3.6-8.6S9.6 5.8 12 3.4Z"/></svg>
+          {%- endcase -%}
+          <span>{{ block.settings.label }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+<style>
+  .pl-trust { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; padding: 6px; }
+  @media (min-width: 820px) { .pl-trust { grid-template-columns: repeat(4, 1fr); } }
+
+  .pl-trust__item {
+    display: flex; align-items: center; gap: 12px; padding: 16px 14px;
+  }
+  .pl-trust__item svg { width: 26px; height: 26px; color: var(--pl-green); flex: 0 0 auto; }
+  .pl-trust__item span {
+    font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--pl-paper-2); line-height: 1.32;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Purelane Trust Bar",
+  "tag": "section",
+  "class": "purelane-trust-section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "trust_item",
+      "name": "Trust item",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "options": [
+          { "value": "leaf", "label": "Leaf (plant)" },
+          { "value": "recycle", "label": "Recycle (packaging)" },
+          { "value": "heart", "label": "Heart (safe)" },
+          { "value": "globe", "label": "Globe (India)" }
+        ], "default": "leaf" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Plant derived<br>formulas" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Trust Bar",
+      "blocks": [
+        { "type": "trust_item", "settings": { "icon": "leaf", "label": "Plant derived<br>formulas" } },
+        { "type": "trust_item", "settings": { "icon": "recycle", "label": "Recyclable<br>packaging" } },
+        { "type": "trust_item", "settings": { "icon": "heart", "label": "Safe for<br>kids & pets" } },
+        { "type": "trust_item", "settings": { "icon": "globe", "label": "Made in<br>India" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
